@@ -538,7 +538,7 @@ const AccessibleNewsApp = () => {
                         url: article.url,
                     });
                     announce("Artigo compartilhado com sucesso");
-                } catch (err) {
+                } catch (err: any) {
                     if (err.name !== "AbortError") {
                         announce("Compartilhamento cancelado");
                     }
