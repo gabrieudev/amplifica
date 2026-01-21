@@ -308,7 +308,7 @@ const AccessibleNewsApp = () => {
         }
     };
 
-    const announce = useCallback((message) => {
+    const announce = useCallback((message: string) => {
         setAnnounceMessage(message);
         if (announceTimeoutRef.current) {
             clearTimeout(announceTimeoutRef.current);
@@ -345,7 +345,7 @@ const AccessibleNewsApp = () => {
     );
 
     const skipToMain = useCallback(
-        (e) => {
+        (e: KeyboardEvent) => {
             e.preventDefault();
             mainContentRef.current?.focus();
             announce("Navegando para o conteúdo principal");
@@ -398,7 +398,7 @@ const AccessibleNewsApp = () => {
     );
 
     const changeCategory = useCallback(
-        (category) => {
+        (category: string) => {
             setSelectedCategory(category);
             setMobileMenuOpen(false);
             announce(
@@ -411,7 +411,7 @@ const AccessibleNewsApp = () => {
     );
 
     const toggleSaveArticle = useCallback(
-        (article) => {
+        (article: Article) => {
             const isSaved = savedArticles.some((a) => a.url === article.url);
             if (isSaved) {
                 setSavedArticles((prev) =>
@@ -427,7 +427,7 @@ const AccessibleNewsApp = () => {
     );
 
     const toggleLikeArticle = useCallback(
-        (article) => {
+        (article: Article) => {
             const isLiked = likedArticles.some((a) => a.url === article.url);
             if (isLiked) {
                 setLikedArticles((prev) =>
@@ -443,7 +443,7 @@ const AccessibleNewsApp = () => {
     );
 
     const markAsRead = useCallback(
-        (article) => {
+        (article: Article) => {
             if (!readArticles.some((a) => a.url === article.url)) {
                 setReadArticles((prev) => [...prev, article]);
             }
@@ -452,7 +452,7 @@ const AccessibleNewsApp = () => {
     );
 
     const openReadingMode = useCallback(
-        (article) => {
+        (article: Article) => {
             lastFocusedRef.current = document.activeElement;
             setSelectedArticle(article);
             setReadingMode(true);
@@ -477,7 +477,7 @@ const AccessibleNewsApp = () => {
     }, [announce]);
 
     const speakText = useCallback(
-        (text) => {
+        (text: string) => {
             if (!speechSynthesisAvailable) {
                 announce("Leitura em voz alta não disponível neste navegador");
                 return;
@@ -522,7 +522,7 @@ const AccessibleNewsApp = () => {
     }, [speechSynthesisAvailable, announce]);
 
     const shareArticle = useCallback(
-        async (article) => {
+        async (article: Article) => {
             if (navigator.share) {
                 try {
                     await navigator.share({
@@ -551,7 +551,7 @@ const AccessibleNewsApp = () => {
     );
 
     const sortArticles = useCallback(
-        (articlesToSort) => {
+        (articlesToSort: Article[]) => {
             const sorted = [...articlesToSort];
             if (sortBy === "publishedAt") {
                 sorted.sort(
