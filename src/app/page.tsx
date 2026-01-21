@@ -176,7 +176,7 @@ const AccessibleNewsApp = () => {
             );
 
             setDarkMode(savedDarkMode);
-            setFontSize(savedFontSize);
+            setFontSize(savedFontSize as "small" | "medium" | "large");
             setHighContrast(savedHighContrast);
             setReducedMotion(savedReducedMotion);
             setSavedArticles(savedArticlesData);
@@ -382,7 +382,7 @@ const AccessibleNewsApp = () => {
     }, [announce]);
 
     const changeFontSize = useCallback(
-        (size) => {
+        (size: "small" | "medium" | "large") => {
             setFontSize(size);
             announce(
                 `Tamanho da fonte alterado para ${
