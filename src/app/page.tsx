@@ -35,28 +35,40 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Article } from "./types";
 
 const AccessibleNewsApp = () => {
-    const [articles, setArticles] = useState([]);
-    const [allArticles, setAllArticles] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [darkMode, setDarkMode] = useState(false);
-    const [fontSize, setFontSize] = useState("medium");
-    const [selectedCategory, setSelectedCategory] = useState("general");
-    const [searchQuery, setSearchQuery] = useState("");
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [announceMessage, setAnnounceMessage] = useState("");
-    const [savedArticles, setSavedArticles] = useState([]);
-    const [likedArticles, setLikedArticles] = useState([]);
-    const [readingMode, setReadingMode] = useState(false);
-    const [selectedArticle, setSelectedArticle] = useState(null);
-    const [speechEnabled, setSpeechEnabled] = useState(false);
-    const [isSpeaking, setIsSpeaking] = useState(false);
-    const [highContrast, setHighContrast] = useState(false);
-    const [reducedMotion, setReducedMotion] = useState(false);
-    const [sortBy, setSortBy] = useState("publishedAt");
-    const [showFilters, setShowFilters] = useState(false);
-    const [readArticles, setReadArticles] = useState([]);
-    const [imageErrors, setImageErrors] = useState({});
+    const [articles, setArticles] = useState<Article[]>([]);
+    const [allArticles, setAllArticles] = useState<Article[]>([]);
+    const [savedArticles, setSavedArticles] = useState<Article[]>([]);
+    const [likedArticles, setLikedArticles] = useState<Article[]>([]);
+    const [readArticles, setReadArticles] = useState<Article[]>([]);
+
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+
+    const [darkMode, setDarkMode] = useState<boolean>(false);
+    const [highContrast, setHighContrast] = useState<boolean>(false);
+    const [reducedMotion, setReducedMotion] = useState<boolean>(false);
+    const [readingMode, setReadingMode] = useState<boolean>(false);
+    const [speechEnabled, setSpeechEnabled] = useState<boolean>(false);
+    const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+    const [showFilters, setShowFilters] = useState<boolean>(false);
+
+    const [fontSize, setFontSize] = useState<"small" | "medium" | "large">(
+        "medium",
+    );
+    const [selectedCategory, setSelectedCategory] = useState<string>("general");
+    const [sortBy, setSortBy] = useState<
+        "publishedAt" | "relevance" | "popularity"
+    >("publishedAt");
+
+    const [searchQuery, setSearchQuery] = useState<string>("");
+    const [announceMessage, setAnnounceMessage] = useState<string>("");
+
+    const [selectedArticle, setSelectedArticle] = useState<Article | null>(
+        null,
+    );
+
+    const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
     const mainContentRef = useRef(null);
     const searchInputRef = useRef(null);
