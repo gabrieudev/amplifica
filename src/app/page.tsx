@@ -59,7 +59,7 @@ const AccessibleNewsApp = () => {
     );
     const [selectedCategory, setSelectedCategory] = useState<string>("general");
     const [sortBy, setSortBy] = useState<
-        "publishedAt" | "relevance" | "popularity"
+        "publishedAt" | "relevance" | "popularity" | "title"
     >("publishedAt");
 
     const [searchQuery, setSearchQuery] = useState<string>("");
