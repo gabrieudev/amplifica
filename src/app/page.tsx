@@ -32,6 +32,7 @@ import {
     Settings,
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Article } from "./types";
 
 const AccessibleNewsApp = () => {
     const [articles, setArticles] = useState([]);
@@ -232,7 +233,9 @@ const AccessibleNewsApp = () => {
             if (data.status === "ok") {
                 const slice = data.articles
                     .slice(0, 12)
-                    .filter((article) => article.title !== "[Removed]");
+                    .filter(
+                        (article: Article) => article.title !== "[Removed]",
+                    );
                 setArticles(slice);
                 setAllArticles(slice);
                 announce(
