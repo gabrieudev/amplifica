@@ -57,7 +57,7 @@ const AccessibleNewsApp = () => {
     const [fontSize, setFontSize] = useState<"small" | "medium" | "large">(
         "medium",
     );
-    const [selectedCategory, setSelectedCategory] = useState<string>("general");
+    const [selectedCategory, setSelectedCategory] = useState<string>("other");
     const [sortBy, setSortBy] = useState<
         "publishedAt" | "relevance" | "popularity" | "title"
     >("publishedAt");
@@ -85,7 +85,7 @@ const AccessibleNewsApp = () => {
 
     // Mapeamento de cores fixo para evitar problemas do Tailwind
     const categoryColors = {
-        general: {
+        other: {
             gradient: "from-blue-600 to-blue-700",
             bg: "bg-blue-600",
             text: "text-blue-600",
@@ -109,7 +109,7 @@ const AccessibleNewsApp = () => {
 
     const categories = [
         {
-            id: "general",
+            id: "other",
             name: "Geral",
             icon: Home,
             color: "blue",
@@ -235,7 +235,7 @@ const AccessibleNewsApp = () => {
                 throw new Error("API key não configurada");
             }
 
-            const url = `https://newsapi.org/v2/top-headlines?country=us&category=${selectedCategory}&apiKey=${apiKey}`;
+            const url = `https://newsdata.io/api/1/latest?country=us&category=${selectedCategory}&apiKey=${apiKey}`;
 
             const response = await fetch(url);
 
@@ -245,9 +245,9 @@ const AccessibleNewsApp = () => {
 
             const data = await response.json();
 
-            if (data.status === "ok") {
-                const slice = data.articles
-                    .slice(0, 12)
+            if (data.status === "success") {
+                const slice = data.results
+                    .slice(0, 10)
                     .filter(
                         (article: Article) => article.title !== "[Removed]",
                     );
@@ -265,47 +265,6 @@ const AccessibleNewsApp = () => {
                 "Erro ao carregar notícias. Usando exemplos de demonstração.",
             );
             announce("Erro ao carregar notícias. Mostrando exemplos.");
-
-            const demoArticles = [
-                {
-                    title: "Avanços em Inteligência Artificial transformam indústria tecnológica",
-                    description:
-                        "Novas ferramentas de IA generativa estão revolucionando a forma como empresas trabalham e inovam. Este é um exemplo de notícia para demonstração da plataforma.",
-                    url: "#",
-                    urlToImage:
-                        "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=250&fit=crop",
-                    publishedAt: new Date().toISOString(),
-                    source: { name: "Tech News" },
-                    content:
-                        "Este é um artigo de demonstração completo sobre os avanços recentes em inteligência artificial...",
-                },
-                {
-                    title: "Mercado financeiro mostra recuperação após volatilidade",
-                    description:
-                        "Investidores demonstram otimismo renovado após semana de incertezas. Análise completa das tendências do mercado.",
-                    url: "#",
-                    urlToImage:
-                        "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=250&fit=crop",
-                    publishedAt: new Date(Date.now() - 86400000).toISOString(),
-                    source: { name: "Business Today" },
-                    content:
-                        "Artigo detalhado sobre a recuperação do mercado financeiro...",
-                },
-                {
-                    title: "Inovações em saúde digital melhoram acesso a tratamentos",
-                    description:
-                        "Telemedicina e aplicativos de saúde expandem atendimento para áreas remotas, democratizando o acesso à saúde de qualidade.",
-                    url: "#",
-                    urlToImage:
-                        "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&h=250&fit=crop",
-                    publishedAt: new Date(Date.now() - 172800000).toISOString(),
-                    source: { name: "Health Watch" },
-                    content:
-                        "Explore como a tecnologia está transformando o setor de saúde...",
-                },
-            ];
-            setArticles(demoArticles);
-            setAllArticles(demoArticles);
         } finally {
             setLoading(false);
         }
@@ -419,10 +378,10 @@ const AccessibleNewsApp = () => {
 
     const toggleSaveArticle = useCallback(
         (article: Article) => {
-            const isSaved = savedArticles.some((a) => a.url === article.url);
+            const isSaved = savedArticles.some((a) => a.link === article.link);
             if (isSaved) {
                 setSavedArticles((prev) =>
-                    prev.filter((a) => a.url !== article.url),
+                    prev.filter((a) => a.link !== article.link),
                 );
                 announce("Artigo removido dos salvos");
             } else {
@@ -435,10 +394,10 @@ const AccessibleNewsApp = () => {
 
     const toggleLikeArticle = useCallback(
         (article: Article) => {
-            const isLiked = likedArticles.some((a) => a.url === article.url);
+            const isLiked = likedArticles.some((a) => a.link === article.link);
             if (isLiked) {
                 setLikedArticles((prev) =>
-                    prev.filter((a) => a.url !== article.url),
+                    prev.filter((a) => a.link !== article.link),
                 );
                 announce("Like removido");
             } else {
@@ -451,7 +410,7 @@ const AccessibleNewsApp = () => {
 
     const markAsRead = useCallback(
         (article: Article) => {
-            if (!readArticles.some((a) => a.url === article.url)) {
+            if (!readArticles.some((a) => a.link === article.link)) {
                 setReadArticles((prev) => [...prev, article]);
             }
         },
@@ -535,7 +494,7 @@ const AccessibleNewsApp = () => {
                     await navigator.share({
                         title: article.title,
                         text: article.description,
-                        url: article.url,
+                        url: article.link,
                     });
                     announce("Artigo compartilhado com sucesso");
                 } catch (err) {
@@ -545,7 +504,7 @@ const AccessibleNewsApp = () => {
                 }
             } else if (navigator.clipboard) {
                 try {
-                    await navigator.clipboard.writeText(article.url);
+                    await navigator.clipboard.writeText(article.link);
                     announce("Link copiado para a área de transferência");
                 } catch (err) {
                     announce("Não foi possível copiar o link");
@@ -562,8 +521,8 @@ const AccessibleNewsApp = () => {
             const sorted = [...articlesToSort];
             if (sortBy === "publishedAt") {
                 sorted.sort((a, b) => {
-                    const dateA = new Date(a.publishedAt || "");
-                    const dateB = new Date(b.publishedAt || "");
+                    const dateA = new Date(a.pubDate || "");
+                    const dateB = new Date(b.pubDate || "");
                     return dateB.getTime() - dateA.getTime();
                 });
             } else if (sortBy === "title") {
@@ -1280,19 +1239,19 @@ const AccessibleNewsApp = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {sortedArticles.map((article, index) => {
                                 const isSaved = savedArticles.some(
-                                    (a) => a.url === article.url,
+                                    (a) => a.link === article.link,
                                 );
                                 const isLiked = likedArticles.some(
-                                    (a) => a.url === article.url,
+                                    (a) => a.link === article.link,
                                 );
                                 const isRead = readArticles.some(
-                                    (a) => a.url === article.url,
+                                    (a) => a.link === article.link,
                                 );
-                                const imageError = imageErrors[article.url];
+                                const imageError = imageErrors[article.link];
 
                                 return (
                                     <article
-                                        key={`${article.url}-${index}`}
+                                        key={`${article.link}-${index}`}
                                         className={`${
                                             colors.card
                                         } rounded-2xl shadow-lg overflow-hidden border-2 ${
@@ -1305,10 +1264,10 @@ const AccessibleNewsApp = () => {
                                         itemScope
                                         itemType="https://schema.org/NewsArticle"
                                     >
-                                        {article.urlToImage && !imageError && (
+                                        {article.image_url && !imageError && (
                                             <div className="relative h-56 overflow-hidden">
                                                 <img
-                                                    src={article.urlToImage}
+                                                    src={article.image_url}
                                                     alt={
                                                         article.title ||
                                                         article.description ||
@@ -1322,7 +1281,7 @@ const AccessibleNewsApp = () => {
                                                     loading="lazy"
                                                     onError={() =>
                                                         handleImageError(
-                                                            article.url,
+                                                            article.image_url,
                                                         )
                                                     }
                                                     itemProp="image"
@@ -1343,18 +1302,16 @@ const AccessibleNewsApp = () => {
                                         <div className="p-6">
                                             <div className="flex items-center justify-between mb-4">
                                                 <span className="inline-block px-4 py-2 rounded-full text-sm font-bold bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md">
-                                                    {article.source?.name ||
+                                                    {article.source_name ||
                                                         "Fonte desconhecida"}
                                                 </span>
                                                 <time
-                                                    dateTime={
-                                                        article.publishedAt
-                                                    }
+                                                    dateTime={article.pubDate}
                                                     className={`text-sm opacity-75 ${fontSizes[fontSize].card}`}
                                                     itemProp="datePublished"
                                                 >
                                                     {new Date(
-                                                        article.publishedAt,
+                                                        article.pubDate,
                                                     ).toLocaleDateString(
                                                         "pt-BR",
                                                     )}
@@ -1587,9 +1544,9 @@ const AccessibleNewsApp = () => {
                             id="reading-mode-content"
                             className="p-8 space-y-6"
                         >
-                            {selectedArticle.urlToImage && (
+                            {selectedArticle.image_url && (
                                 <img
-                                    src={selectedArticle.urlToImage}
+                                    src={selectedArticle.image_url}
                                     alt={
                                         selectedArticle.title ||
                                         selectedArticle.description ||

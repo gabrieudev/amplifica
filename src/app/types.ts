@@ -1,11 +1,9 @@
 export interface Article {
     title: string;
     description?: string;
-    url: string;
-    urlToImage?: string;
-    publishedAt: string;
     content?: string;
-    source?: {
-        name: string;
-    };
+    image_url?: string;
+    pubDate?: string;
+    link: string;
+    source_name?: string;
 }
