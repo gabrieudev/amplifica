@@ -1630,8 +1630,7 @@ const AccessibleNewsApp = () => {
 
                     <div className="text-center pt-8 border-t-2 border-gray-200 dark:border-gray-700">
                         <p className="opacity-75">
-                            © 2026 Amplifica - Desenvolvido com foco em inclusão
-                            digital
+                            © 2026 Amplifica - Desenvolvido por João Gabriel
                         </p>
                         <p className="mt-2 text-sm opacity-60">
                             Dados fornecidos por News API
