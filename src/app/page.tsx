@@ -6,6 +6,7 @@ import React, {
     useRef,
     useMemo,
     useCallback,
+    FormEvent,
 } from "react";
 import {
     Search,
@@ -70,12 +71,14 @@ const AccessibleNewsApp = () => {
 
     const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
-    const mainContentRef = useRef(null);
-    const searchInputRef = useRef(null);
-    const closeBtnRef = useRef(null);
-    const lastFocusedRef = useRef(null);
-    const announceTimeoutRef = useRef(null);
-    const modalRef = useRef(null);
+    const mainContentRef = useRef<HTMLElement | null>(null);
+    const searchInputRef = useRef<HTMLInputElement | null>(null);
+    const closeBtnRef = useRef<HTMLButtonElement | null>(null);
+    const lastFocusedRef = useRef<HTMLElement | null>(null);
+    const announceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+        null,
+    );
+    const modalRef = useRef<HTMLDivElement | null>(null);
 
     const speechSynthesisAvailable =
         typeof window !== "undefined" && !!window.speechSynthesis;
@@ -320,7 +323,7 @@ const AccessibleNewsApp = () => {
     }, []);
 
     const handleSearch = useCallback(
-        (e) => {
+        (e: FormEvent<HTMLFormElement>) => {
             if (e && e.preventDefault) e.preventDefault();
             if (searchQuery.trim()) {
                 const filtered = allArticles.filter(
@@ -345,7 +348,11 @@ const AccessibleNewsApp = () => {
     );
 
     const skipToMain = useCallback(
-        (e: KeyboardEvent) => {
+        (
+            e:
+                | React.MouseEvent<HTMLAnchorElement, MouseEvent>
+                | React.KeyboardEvent<HTMLAnchorElement>,
+        ) => {
             e.preventDefault();
             mainContentRef.current?.focus();
             announce("Navegando para o conteúdo principal");
@@ -453,7 +460,7 @@ const AccessibleNewsApp = () => {
 
     const openReadingMode = useCallback(
         (article: Article) => {
-            lastFocusedRef.current = document.activeElement;
+            lastFocusedRef.current as HTMLElement | null;
             setSelectedArticle(article);
             setReadingMode(true);
             markAsRead(article);
@@ -461,7 +468,7 @@ const AccessibleNewsApp = () => {
 
             // Auto-speech se speechEnabled estiver ativo
             if (speechEnabled) {
-                const text = `${article.title}. ${article.description || article.content || ""}`;
+                const text = `${article.title}. ${article.description || ""}`;
                 setTimeout(() => speakText(text), 300);
             }
         },
@@ -554,11 +561,11 @@ const AccessibleNewsApp = () => {
         (articlesToSort: Article[]) => {
             const sorted = [...articlesToSort];
             if (sortBy === "publishedAt") {
-                sorted.sort(
-                    (a, b) =>
-                        new Date(b.publishedAt || 0) -
-                        new Date(a.publishedAt || 0),
-                );
+                sorted.sort((a, b) => {
+                    const dateA = new Date(a.publishedAt || "");
+                    const dateB = new Date(b.publishedAt || "");
+                    return dateB.getTime() - dateA.getTime();
+                });
             } else if (sortBy === "title") {
                 sorted.sort((a, b) =>
                     (a.title || "").localeCompare(b.title || ""),
@@ -633,7 +640,7 @@ const AccessibleNewsApp = () => {
             closeBtnRef.current?.focus();
         }, 50);
 
-        const handleKeyDown = (e) => {
+        const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === "Escape") {
                 closeReadingMode();
                 return;
@@ -670,7 +677,7 @@ const AccessibleNewsApp = () => {
     // Leitura automática ao abrir modal
     useEffect(() => {
         if (readingMode && selectedArticle && speechEnabled) {
-            const text = `${selectedArticle.title}. ${selectedArticle.description || selectedArticle.content || ""}`;
+            const text = `${selectedArticle.title}. ${selectedArticle.description || ""}`;
             const timer = setTimeout(() => speakText(text), 500);
             return () => clearTimeout(timer);
         }
