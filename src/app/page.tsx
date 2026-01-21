@@ -538,7 +538,7 @@ const AccessibleNewsApp = () => {
                         url: article.url,
                     });
                     announce("Artigo compartilhado com sucesso");
-                } catch (err: any) {
+                } catch (err) {
                     if (err.name !== "AbortError") {
                         announce("Compartilhamento cancelado");
                     }
@@ -659,13 +659,13 @@ const AccessibleNewsApp = () => {
 
                 if (e.shiftKey && document.activeElement === firstElement) {
                     e.preventDefault();
-                    lastElement.focus();
+                    (lastElement as HTMLElement).focus();
                 } else if (
                     !e.shiftKey &&
                     document.activeElement === lastElement
                 ) {
                     e.preventDefault();
-                    firstElement.focus();
+                    (firstElement as HTMLElement).focus();
                 }
             }
         };
@@ -997,7 +997,13 @@ const AccessibleNewsApp = () => {
                                 <select
                                     value={sortBy}
                                     onChange={(e) => {
-                                        setSortBy(e.target.value);
+                                        setSortBy(
+                                            e.target.value as
+                                                | "publishedAt"
+                                                | "relevance"
+                                                | "popularity"
+                                                | "title",
+                                        );
                                         announce(
                                             `Ordenação alterada para ${
                                                 e.target.value === "publishedAt"
@@ -1497,9 +1503,7 @@ const AccessibleNewsApp = () => {
                                 <button
                                     onClick={() => {
                                         const text = `${selectedArticle.title}. ${
-                                            selectedArticle.description ||
-                                            selectedArticle.content ||
-                                            ""
+                                            selectedArticle.description || ""
                                         }`;
 
                                         if (isSpeaking) {
